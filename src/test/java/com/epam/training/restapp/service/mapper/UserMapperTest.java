@@ -45,12 +45,13 @@ public class UserMapperTest {
                 .password("Some encrypted password")
                 .posts(Arrays.asList(null, null, null))
                 .build();
-        user = new UserInfo();
-        user.setEmail("Some email");
-        user.setFullName("Some fullname");
-        user.setId(1);
-        user.setPassword("Some encrypted password");
-        user.setPostInfos(Arrays.asList(null, null, null));
+        user = UserInfo.builder()
+                .email("Some email")
+                .fullName("Some fullname")
+                .id(1)
+                .password("Some encrypted password")
+                .postInfos(Arrays.asList(null, null, null))
+                .build();
     }
 
     @AfterEach

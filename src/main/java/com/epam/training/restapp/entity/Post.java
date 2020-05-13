@@ -1,42 +1,51 @@
 package com.epam.training.restapp.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "posts")
 public class Post {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private final Integer id;
+    private Integer id;
 
     @Column(name = "title", nullable = false)
-    private final String title;
+    private String title;
 
     @Column(name = "description", nullable = false)
-    private final String description;
+    private String description;
 
     @Column(name = "content")
-    private final String content;
+    private String content;
 
     @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private final LocalDateTime createdTime;
+    private LocalDateTime createdTime;
 
     @Column(name = "modified_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-    private final LocalDateTime modifiedTime;
+    private LocalDateTime modifiedTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private final User user;
+    private User user;
 }

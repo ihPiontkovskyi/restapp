@@ -2,8 +2,9 @@ package com.epam.training.restapp.service.mapper.impl;
 
 import com.epam.training.restapp.dto.PostInfo;
 import com.epam.training.restapp.entity.Post;
+import com.epam.training.restapp.exception.ElementNotFoundException;
+import com.epam.training.restapp.repository.UserRepository;
 import com.epam.training.restapp.service.mapper.PostMapper;
-import com.epam.training.restapp.service.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PostMapperImpl implements PostMapper {
-
-    private final UserMapper userMapper;
+    private final UserRepository repository;
 
     @Override
     public Post mapToEntity(PostInfo dto) {
@@ -26,7 +26,8 @@ public class PostMapperImpl implements PostMapper {
                 .modifiedTime(dto.getModifiedTime())
                 .description(dto.getDescription())
                 .title(dto.getTitle())
-                .user(userMapper.mapToEntity(dto.getUserInfo()))
+                .user(repository.findById(dto.getUserId())
+                        .orElseThrow(() -> new ElementNotFoundException("User id :" + dto.getUserId() + "not found!")))
                 .build();
     }
 
@@ -35,14 +36,14 @@ public class PostMapperImpl implements PostMapper {
         if (entity == null) {
             return null;
         }
-        PostInfo dto = new PostInfo();
-        dto.setContent(entity.getContent());
-        dto.setCreatedTime(entity.getCreatedTime());
-        dto.setDescription(entity.getDescription());
-        dto.setId(entity.getId());
-        dto.setModifiedTime(entity.getModifiedTime());
-        dto.setTitle(entity.getTitle());
-        dto.setUserInfo(userMapper.mapToDto(entity.getUser()));
-        return dto;
+        return PostInfo.builder()
+                .content(entity.getContent())
+                .createdTime(entity.getCreatedTime())
+                .description(entity.getDescription())
+                .id(entity.getId())
+                .modifiedTime(entity.getModifiedTime())
+                .title(entity.getTitle())
+                .userId(entity.getUser().getId())
+                .build();
     }
 }

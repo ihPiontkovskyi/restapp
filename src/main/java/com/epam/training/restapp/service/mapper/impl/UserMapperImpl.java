@@ -37,15 +37,15 @@ public class UserMapperImpl implements UserMapper {
         if (entity == null) {
             return null;
         }
-        UserInfo dto = new UserInfo();
-        dto.setEmail(entity.getEmail());
-        dto.setFullName(entity.getFullName());
-        dto.setId(entity.getId());
-        dto.setPassword(entity.getPassword());
-        dto.setPostInfos(entity.getPosts()
-                .stream()
-                .map(postMapper::mapToDto)
-                .collect(Collectors.toList()));
-        return dto;
+        return UserInfo.builder()
+                .id(entity.getId())
+                .email(entity.getEmail())
+                .fullName(entity.getFullName())
+                .password(entity.getPassword())
+                .postInfos(entity.getPosts()
+                        .stream()
+                        .map(postMapper::mapToDto)
+                        .collect(Collectors.toList()))
+                .build();
     }
 }

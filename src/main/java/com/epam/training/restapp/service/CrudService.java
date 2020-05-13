@@ -4,11 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CrudService<D> {
-    Page<D> getAllPosts(Pageable pageable);
+    Page<D> getAll(Pageable pageable);
 
-    D createPost(D dto);
+    D create(D dto);
 
-    D updatePost(Integer id, D dto);
+    D update(Integer id, D dto);
 
     void delete(Integer id);
 }

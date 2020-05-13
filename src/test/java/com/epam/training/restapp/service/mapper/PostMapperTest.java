@@ -2,6 +2,8 @@ package com.epam.training.restapp.service.mapper;
 
 import com.epam.training.restapp.dto.PostInfo;
 import com.epam.training.restapp.entity.Post;
+import com.epam.training.restapp.entity.User;
+import com.epam.training.restapp.repository.UserRepository;
 import com.epam.training.restapp.service.mapper.impl.PostMapperImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,8 +29,10 @@ public class PostMapperTest {
 
     private static final LocalDateTime CREATED_TIME = LocalDateTime.of(2020, 5, 13, 14, 0, 0);
     private static final LocalDateTime TIME_NOW = LocalDateTime.now();
+    private static final User EMPTY_USER = User.builder().build();
+
     @Mock
-    private UserMapper userMapper;
+    private UserRepository userRepository;
 
     @InjectMocks
     private PostMapperImpl mapper;
@@ -44,21 +49,22 @@ public class PostMapperTest {
                 .id(1)
                 .modifiedTime(TIME_NOW)
                 .title("Some title")
-                .user(null)
+                .user(User.builder().id(1).build())
                 .build();
-        post = new PostInfo();
-        post.setContent("Some text");
-        post.setCreatedTime(CREATED_TIME);
-        post.setDescription("Some description");
-        post.setModifiedTime(TIME_NOW);
-        post.setTitle("Some title");
-        post.setUserInfo(null);
-        post.setId(1);
+        post = PostInfo.builder()
+                .content("Some text")
+                .createdTime(CREATED_TIME)
+                .description("Some description")
+                .id(1)
+                .modifiedTime(TIME_NOW)
+                .title("Some title")
+                .userId(1)
+                .build();
     }
 
     @AfterEach
     void resetData() {
-        reset(userMapper);
+        reset(userRepository);
     }
 
     @Test
@@ -73,8 +79,6 @@ public class PostMapperTest {
 
     @Test
     void mapToDtoWhenCorrectEntityShouldReturnCorrectDto() {
-        when(userMapper.mapToDto(null)).thenReturn(null);
-
         PostInfo dto = mapper.mapToDto(postEntity);
 
         assertAll(
@@ -84,14 +88,13 @@ public class PostMapperTest {
                 () -> assertEquals(dto.getModifiedTime(), postEntity.getModifiedTime()),
                 () -> assertEquals(dto.getTitle(), postEntity.getTitle()),
                 () -> assertEquals(dto.getId(), postEntity.getId()),
-                () -> assertNull(dto.getUserInfo())
+                () -> assertEquals(1, dto.getUserId())
         );
-        verify(userMapper).mapToDto(null);
     }
 
     @Test
     void mapToEntityWhenCorrectDtoShouldReturnCorrectEntity() {
-        when(userMapper.mapToEntity(null)).thenReturn(null);
+        when(userRepository.findById(1)).thenReturn(Optional.of(EMPTY_USER));
 
         Post entity = mapper.mapToEntity(post);
 
@@ -102,8 +105,8 @@ public class PostMapperTest {
                 () -> assertEquals(entity.getModifiedTime(), post.getModifiedTime()),
                 () -> assertEquals(entity.getTitle(), post.getTitle()),
                 () -> assertEquals(entity.getId(), post.getId()),
-                () -> assertNull(entity.getUser())
+                () -> assertEquals(EMPTY_USER, entity.getUser())
         );
-        verify(userMapper).mapToEntity(null);
+        verify(userRepository).findById(1);
     }
 }
