@@ -2,7 +2,6 @@ package com.epam.training.restapp.service;
 
 import com.epam.training.restapp.dto.PostInfo;
 import com.epam.training.restapp.entity.Post;
-import com.epam.training.restapp.entity.User;
 import com.epam.training.restapp.exception.ElementNotFoundException;
 import com.epam.training.restapp.repository.PostRepository;
 import com.epam.training.restapp.service.impl.PostServiceImpl;
@@ -19,10 +18,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.epam.training.restapp.TestDataProvider.getPostInfoPassedData;
+import static com.epam.training.restapp.TestDataProvider.getPostInfoTestData;
+import static com.epam.training.restapp.TestDataProvider.getPostPassedData;
+import static com.epam.training.restapp.TestDataProvider.getPostTestData;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -44,48 +46,16 @@ public class PostServiceTest {
     private PostServiceImpl service;
 
     private PostInfo testPostInfo;
-    private PostInfo passedPostInfoData;
+    private PostInfo passedPostInfo;
     private Post testPost;
-    private Post passedPostData;
+    private Post passedPost;
 
     @BeforeEach
     void intiData() {
-        testPostInfo = PostInfo.builder()
-                .content("Some text")
-                .createdTime(LocalDateTime.of(2019, 5, 13, 14, 0, 0))
-                .description("Some description")
-                .id(1)
-                .modifiedTime(LocalDateTime.of(2020, 5, 13, 14, 0, 0))
-                .title("Some title")
-                .userId(1)
-                .build();
-        passedPostInfoData = PostInfo.builder()
-                .content("text")
-                .createdTime(LocalDateTime.of(2018, 5, 13, 14, 0, 0))
-                .description("description")
-                .id(2)
-                .modifiedTime(LocalDateTime.of(2019, 5, 12, 14, 0, 0))
-                .title("title")
-                .userId(2)
-                .build();
-        testPost = Post.builder()
-                .content("Some text")
-                .createdTime(LocalDateTime.of(2019, 5, 13, 14, 0, 0))
-                .description("Some description")
-                .id(1)
-                .modifiedTime(LocalDateTime.of(2020, 5, 13, 14, 0, 0))
-                .title("Some title")
-                .user(User.builder().id(1).build())
-                .build();
-        passedPostData = Post.builder()
-                .content("text")
-                .createdTime(LocalDateTime.of(2018, 5, 13, 14, 0, 0))
-                .description("description")
-                .id(2)
-                .modifiedTime(LocalDateTime.of(2019, 5, 12, 14, 0, 0))
-                .title("title")
-                .user(User.builder().id(2).build())
-                .build();
+        testPostInfo = getPostInfoTestData();
+        passedPostInfo = getPostInfoPassedData();
+        testPost = getPostTestData();
+        passedPost = getPostPassedData();
     }
 
     @AfterEach
@@ -96,23 +66,22 @@ public class PostServiceTest {
     @Test
     void createShouldReturnTestPostInfoData() {
         when(mapper.mapToEntity(testPostInfo)).thenReturn(testPost);
-        when(repository.save(testPost)).thenReturn(passedPostData);
-        when(mapper.mapToDto(passedPostData)).thenReturn(passedPostInfoData);
+        when(repository.save(testPost)).thenReturn(passedPost);
+        when(mapper.mapToDto(passedPost)).thenReturn(passedPostInfo);
 
         PostInfo result = service.create(testPostInfo);
 
         assertAll(
-                () -> assertEquals(passedPostInfoData.getUserId(), result.getUserId()),
-                () -> assertEquals(passedPostInfoData.getTitle(), result.getTitle()),
-                () -> assertEquals(passedPostInfoData.getId(), result.getId()),
-                () -> assertEquals(passedPostInfoData.getModifiedTime(), result.getModifiedTime()),
-                () -> assertEquals(passedPostInfoData.getDescription(), result.getDescription()),
-                () -> assertEquals(passedPostInfoData.getContent(), result.getContent()),
-                () -> assertEquals(passedPostInfoData.getCreatedTime(), result.getCreatedTime())
+                () -> assertEquals(passedPostInfo.getTitle(), result.getTitle()),
+                () -> assertEquals(passedPostInfo.getId(), result.getId()),
+                () -> assertEquals(passedPostInfo.getModifiedTime(), result.getModifiedTime()),
+                () -> assertEquals(passedPostInfo.getDescription(), result.getDescription()),
+                () -> assertEquals(passedPostInfo.getContent(), result.getContent()),
+                () -> assertEquals(passedPostInfo.getCreatedTime(), result.getCreatedTime())
         );
         verify(mapper).mapToEntity(testPostInfo);
         verify(repository).save(testPost);
-        verify(mapper).mapToDto(passedPostData);
+        verify(mapper).mapToDto(passedPost);
     }
 
     @Test
@@ -129,15 +98,15 @@ public class PostServiceTest {
     @Test
     void findAllShouldReturnPageWith1Element() {
         Pageable pageable = Mockito.mock(Pageable.class);
-        final PageImpl<Post> page = new PageImpl<>(Collections.singletonList(passedPostData), pageable, 1);
+        final PageImpl<Post> page = new PageImpl<>(Collections.singletonList(passedPost), pageable, 1);
         when(repository.findAll(pageable)).thenReturn(page);
-        when(mapper.mapToDto(passedPostData)).thenReturn(passedPostInfoData);
+        when(mapper.mapToDto(passedPost)).thenReturn(passedPostInfo);
 
         Page<PostInfo> result = service.getAll(pageable);
 
         assertEquals(1, result.getSize());
         verify(repository).findAll(pageable);
-        verify(mapper).mapToDto(passedPostData);
+        verify(mapper).mapToDto(passedPost);
     }
 
     @Test
@@ -171,11 +140,11 @@ public class PostServiceTest {
     @Test
     void updateShouldUpdateElementSuccessfully() {
         when(repository.findById(1)).thenReturn(Optional.of(testPost));
-        when(mapper.mapToDto(testPost)).thenReturn(passedPostInfoData);
-        when(mapper.mapToEntity(passedPostInfoData)).thenReturn(passedPostData);
-        when(repository.save(passedPostData)).thenReturn(passedPostData);
+        when(mapper.mapToDto(testPost)).thenReturn(passedPostInfo);
+        when(mapper.mapToEntity(passedPostInfo)).thenReturn(passedPost);
+        when(repository.save(passedPost)).thenReturn(passedPost);
         PostInfo emptyPostInfo = PostInfo.builder().build();
-        when(mapper.mapToDto(passedPostData)).thenReturn(emptyPostInfo);
+        when(mapper.mapToDto(passedPost)).thenReturn(emptyPostInfo);
 
         PostInfo result = service.update(1, testPostInfo);
 
@@ -185,13 +154,12 @@ public class PostServiceTest {
                 () -> assertNull(result.getDescription()),
                 () -> assertNull(result.getModifiedTime()),
                 () -> assertNull(result.getId()),
-                () -> assertNull(result.getTitle()),
-                () -> assertNull(result.getUserId())
+                () -> assertNull(result.getTitle())
         );
         verify(repository).findById(1);
         verify(mapper).mapToDto(testPost);
-        verify(mapper).mapToEntity(passedPostInfoData);
-        verify(repository).save(passedPostData);
-        verify(mapper).mapToDto(passedPostData);
+        verify(mapper).mapToEntity(passedPostInfo);
+        verify(repository).save(passedPost);
+        verify(mapper).mapToDto(passedPost);
     }
 }

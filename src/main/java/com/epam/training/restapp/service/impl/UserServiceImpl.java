@@ -24,7 +24,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserInfo> getAll(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::mapToDto);
+        return repository.findAll(pageable)
+                .map(mapper::mapToDto);
     }
 
     @Override

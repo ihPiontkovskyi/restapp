@@ -22,7 +22,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostInfo> getAll(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::mapToDto);
+        return repository.findAll(pageable)
+                .map(mapper::mapToDto);
     }
 
     @Override
@@ -40,7 +41,6 @@ public class PostServiceImpl implements PostService {
                     e.setDescription(dto.getDescription());
                     e.setCreatedTime(dto.getCreatedTime());
                     e.setContent(dto.getContent());
-                    e.setUserId(dto.getUserId());
                     return mapper.mapToDto(repository.save(mapper.mapToEntity(e)));
                 }).orElseThrow(() -> new ElementNotFoundException("Post id : " + id + " not found!"));
     }

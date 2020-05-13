@@ -2,7 +2,6 @@ package com.epam.training.restapp.service.mapper.impl;
 
 import com.epam.training.restapp.dto.PostInfo;
 import com.epam.training.restapp.entity.Post;
-import com.epam.training.restapp.exception.ElementNotFoundException;
 import com.epam.training.restapp.repository.UserRepository;
 import com.epam.training.restapp.service.mapper.PostMapper;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PostMapperImpl implements PostMapper {
-    private final UserRepository repository;
 
     @Override
     public Post mapToEntity(PostInfo dto) {
@@ -26,8 +24,6 @@ public class PostMapperImpl implements PostMapper {
                 .modifiedTime(dto.getModifiedTime())
                 .description(dto.getDescription())
                 .title(dto.getTitle())
-                .user(repository.findById(dto.getUserId())
-                        .orElseThrow(() -> new ElementNotFoundException("User id :" + dto.getUserId() + "not found!")))
                 .build();
     }
 
@@ -43,7 +39,6 @@ public class PostMapperImpl implements PostMapper {
                 .id(entity.getId())
                 .modifiedTime(entity.getModifiedTime())
                 .title(entity.getTitle())
-                .userId(entity.getUser().getId())
                 .build();
     }
 }

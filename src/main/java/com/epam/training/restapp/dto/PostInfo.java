@@ -30,6 +30,4 @@ public class PostInfo {
     @PastOrPresent
     private LocalDateTime modifiedTime;
 
-    @NotNull
-    private Integer userId;
 }

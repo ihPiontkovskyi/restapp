@@ -11,9 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.Objects;
 
+import static com.epam.training.restapp.TestDataProvider.getUserInfoTestData;
+import static com.epam.training.restapp.TestDataProvider.getUserTestData;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -33,25 +34,13 @@ public class UserMapperTest {
     @InjectMocks
     private UserMapperImpl userMapper;
 
-    private User userEntity;
-    private UserInfo user;
+    private User testUser;
+    private UserInfo testUserInfo;
 
     @BeforeEach
     void initData() {
-        userEntity = User.builder()
-                .email("Some email")
-                .fullName("Some fullname")
-                .id(1)
-                .password("Some encrypted password")
-                .posts(Arrays.asList(null, null, null))
-                .build();
-        user = UserInfo.builder()
-                .email("Some email")
-                .fullName("Some fullname")
-                .id(1)
-                .password("Some encrypted password")
-                .postInfos(Arrays.asList(null, null, null))
-                .build();
+        testUser = getUserTestData();
+        testUserInfo = getUserInfoTestData();
     }
 
     @AfterEach
@@ -73,14 +62,14 @@ public class UserMapperTest {
     void mapToDtoWhenCorrectEntityShouldReturnCorrectDto() {
         when(postMapper.mapToDto(null)).thenReturn(null);
 
-        UserInfo dto = userMapper.mapToDto(userEntity);
+        UserInfo dto = userMapper.mapToDto(testUser);
 
         assertAll(
-                () -> assertEquals(dto.getEmail(), userEntity.getEmail()),
-                () -> assertEquals(dto.getFullName(), userEntity.getFullName()),
-                () -> assertEquals(dto.getPassword(), userEntity.getPassword()),
+                () -> assertEquals(dto.getEmail(), testUser.getEmail()),
+                () -> assertEquals(dto.getFullName(), testUser.getFullName()),
+                () -> assertEquals(dto.getPassword(), testUser.getPassword()),
                 () -> assertEquals(3, dto.getPostInfos().stream().filter(Objects::isNull).count()),
-                () -> assertEquals(dto.getId(), userEntity.getId())
+                () -> assertEquals(dto.getId(), testUser.getId())
         );
         verify(postMapper, times(3)).mapToDto(null);
     }
@@ -89,14 +78,14 @@ public class UserMapperTest {
     void mapToEntityWhenCorrectDtoShouldReturnCorrectEntity() {
         when(postMapper.mapToDto(null)).thenReturn(null);
 
-        User entity = userMapper.mapToEntity(user);
+        User entity = userMapper.mapToEntity(testUserInfo);
 
         assertAll(
-                () -> assertEquals(entity.getEmail(), user.getEmail()),
-                () -> assertEquals(entity.getFullName(), user.getFullName()),
-                () -> assertEquals(entity.getPassword(), user.getPassword()),
+                () -> assertEquals(entity.getEmail(), testUserInfo.getEmail()),
+                () -> assertEquals(entity.getFullName(), testUserInfo.getFullName()),
+                () -> assertEquals(entity.getPassword(), testUserInfo.getPassword()),
                 () -> assertEquals(3, entity.getPosts().stream().filter(Objects::isNull).count()),
-                () -> assertEquals(entity.getId(), user.getId())
+                () -> assertEquals(entity.getId(), testUserInfo.getId())
         );
         verify(postMapper, times(3)).mapToEntity(null);
     }
