@@ -1,6 +1,7 @@
 package com.epam.training.restapp.service.impl;
 
 import com.epam.training.restapp.dto.UserInfo;
+import com.epam.training.restapp.entity.User;
 import com.epam.training.restapp.exception.ElementNotFoundException;
 import com.epam.training.restapp.repository.UserRepository;
 import com.epam.training.restapp.service.UserService;
@@ -9,11 +10,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
+    private final PasswordEncoder encoder;
     private final UserRepository repository;
     private final UserMapper mapper;
 
@@ -24,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserInfo create(UserInfo dto) {
+        dto.setPassword(encoder.encode(dto.getPassword()));
         return mapper.mapToDto(repository.save(mapper.mapToEntity(dto)));
     }
 
@@ -34,14 +40,20 @@ public class UserServiceImpl implements UserService {
                 .map(e -> {
                     e.setEmail(dto.getEmail());
                     e.setFullName(dto.getFullName());
-                    e.setPassword(dto.getPassword());
+                    if (encoder.matches(e.getPassword(), dto.getPassword())) {
+                        e.setPassword(encoder.encode(dto.getPassword()));
+                    }
                     e.setPostInfos(dto.getPostInfos());
                     return mapper.mapToDto(repository.save(mapper.mapToEntity(e)));
-                }).orElseThrow(() -> new ElementNotFoundException("Post id :" + id + "not found!"));
+                }).orElseThrow(() -> new ElementNotFoundException("User id : " + id + " not found!"));
     }
 
     @Override
     public void delete(Integer id) {
-        repository.findById(id).ifPresent(repository::delete);
+        final Optional<User> post = repository.findById(id);
+        if (!post.isPresent()) {
+            throw new ElementNotFoundException("User id : " + id + " not found!");
+        }
+        post.ifPresent(repository::delete);
     }
 }

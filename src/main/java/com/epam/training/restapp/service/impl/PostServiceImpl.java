@@ -42,14 +42,14 @@ public class PostServiceImpl implements PostService {
                     e.setContent(dto.getContent());
                     e.setUserId(dto.getUserId());
                     return mapper.mapToDto(repository.save(mapper.mapToEntity(e)));
-                }).orElseThrow(() -> new ElementNotFoundException("Post id :" + id + "not found!"));
+                }).orElseThrow(() -> new ElementNotFoundException("Post id : " + id + " not found!"));
     }
 
     @Override
     public void delete(Integer id) {
         final Optional<Post> post = repository.findById(id);
         if (!post.isPresent()) {
-            throw new ElementNotFoundException("Post id :" + id + "not found!");
+            throw new ElementNotFoundException("Post id : " + id + " not found!");
         }
         post.ifPresent(repository::delete);
     }
